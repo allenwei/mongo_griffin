@@ -2,6 +2,8 @@ PATH
   remote: .
   specs:
     mongo_griffin (0.1.0)
+      activesupport (>= 2.3.5)
+      nokogiri
       riddle
 
 GEM
@@ -21,6 +23,7 @@ GEM
       durran-validatable (>= 2.0.1)
       mongo (~> 1.0.1)
       will_paginate (< 2.9)
+    nokogiri (1.4.3.1)
     riddle (1.1.0)
     ruby-debug (0.10.3)
       columnize (>= 0.1)
@@ -35,9 +38,11 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activesupport (>= 2.3.5)
   bson_ext
   mongo_griffin!
   mongoid
+  nokogiri
   riddle
   ruby-debug
   shoulda

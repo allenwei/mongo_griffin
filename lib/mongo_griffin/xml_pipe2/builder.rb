@@ -1,26 +1,28 @@
 module MongoGriffin 
   module XMLPipe2
     class Builder 
+      attr_reader :builder
 
-      def initialize(indexes,records) 
-        index = indexes.first
-        builder = Nokogiri::XML::Builder.new do |xml| 
-          xml.root do 
-            xml['spinx'].docset do
+      def initialize(*models) 
+        index = models.first.defined_index
+        records = models.first.all
+        @builder = Nokogiri::XML::Builder.new do |xml| 
+          xml.root('xmlns:sphinx' => 'sphinx') do 
+            xml['sphinx'].docset do
 
-              xml['spinx'].schema do 
+              xml['sphinx'].schema do 
                 index.fields.each do |field|
-                  xml['spinx'].field(:name => field.name) 
+                  xml['sphinx'].field(:name => field.name) 
                 end
                 index.attributes.each do |attr| 
-                  xml['spinx'].attr(:name => field.name) 
+                  xml['sphinx'].attr(:name => attr.name) 
                 end
+                xml['sphinx'].field(:name => 'class_crc')
               end # xml['spinx'].schema do
-
-
 
               records.each do |record|
                 xml['sphinx'].document(:id => record.sphinx_id) do 
+                  xml.class_crc_ index.klass.to_crc32
                   index.fields.each do |field|
                     xml.send(field.name, record.send(field.name))
                   end
@@ -28,11 +30,16 @@ module MongoGriffin
                     xml.send(attr.name, record.send(attr.name))
                   end                
                 end
-              end
+              end # records.each do |record|
             end
-          end
+          end # xml.root do
         end
+        
       end
+      
+      def to_xml 
+        @builder.to_xml
+      end  
     end
   end
 end

@@ -7,7 +7,7 @@ module MongoGriffin
     end
 
     def clean
-      indexed_models = []
+      @indexed_models = []
     end
   end
 end
