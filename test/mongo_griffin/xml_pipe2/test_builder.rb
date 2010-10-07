@@ -30,14 +30,14 @@ module MongoGriffin
             People.new(:first_name => "first_name_#{index}", :last_name => "last_name_#{index}").save!
           end
 
-          builder = ::MongoGriffin::XMLPipe2::Builder.new(People)
+          xml = ::MongoGriffin::XMLPipe2::Builder.to_xml(People)
           first_people = People.first
 
-          assert_equal records_count, builder.builder.doc.xpath("*//sphinx:document").size, "should have #{records_count} records"
-          assert_not_nil builder.builder.doc.xpath("*//sphinx:document['id'='#{first_people.sphinx_id}']"), "should have have first record"
-          assert_equal records_count, builder.builder.doc.xpath("*//sphinx:field['name'='first_name']").size, "should have #{records_count} records"
-          assert_equal records_count, builder.builder.doc.xpath("*//sphinx:field['name'='last_name']").size,  "should have #{records_count} records"
-          assert_equal records_count, builder.builder.doc.xpath("*//sphinx:attr['name'='updated_at']").size,  "should have #{records_count} records"
+          assert_equal records_count, xml.scan("<sphinx:document").size, "should have #{records_count} records"
+          assert_not_nil xml =~ /<sphinx:document id="#{first_people.sphinx_id}"/, "should have have first record"
+          assert_not_nil xml =~ /<sphinx:field name="first_name"/, "should have field 'first_name'"
+          assert_not_nil xml =~ /<sphinx:field name="last_name"/,  "should have field 'last_name'"
+          assert_not_nil xml =~ /<sphinx:attr name="updated_at"/,  "should have attr 'updated_at'"
         end
       end
 

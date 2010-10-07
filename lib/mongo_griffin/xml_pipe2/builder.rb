@@ -1,45 +1,18 @@
 module MongoGriffin 
   module XMLPipe2
     class Builder 
-      attr_reader :builder
+      attr_reader :index
 
-      def initialize(*models) 
-        index = models.first.defined_index
-        records = models.first.all
-        @builder = Nokogiri::XML::Builder.new do |xml| 
-          xml.root('xmlns:sphinx' => 'sphinx') do 
-            xml['sphinx'].docset do
-
-              xml['sphinx'].schema do 
-                index.fields.each do |field|
-                  xml['sphinx'].field(:name => field.name) 
-                end
-                index.attributes.each do |attr| 
-                  xml['sphinx'].attr(:name => attr.name) 
-                end
-                xml['sphinx'].field(:name => 'class_crc')
-              end # xml['spinx'].schema do
-
-              records.each do |record|
-                xml['sphinx'].document(:id => record.sphinx_id) do 
-                  xml.class_crc_ index.klass.to_crc32
-                  index.fields.each do |field|
-                    xml.send(field.name, record.send(field.name))
-                  end
-                  index.attributes.each do |attr| 
-                    xml.send(attr.name, record.send(attr.name))
-                  end                
-                end
-              end # records.each do |record|
-            end
-          end # xml.root do
-        end
-        
+      def self.to_xml(model) 
+        index = model.defined_index
+        xml = [%Q{<?xml version="1.0" encoding="utf-8"?>}]
+        xml << %Q{<sphinx:docset>}
+        xml += index.to_xml
+        xml += index.document_xml
+        xml << %Q{</sphinx:docset>}
+        xml.join("\n")
       end
-      
-      def to_xml 
-        @builder.to_xml
-      end  
+
     end
   end
 end
